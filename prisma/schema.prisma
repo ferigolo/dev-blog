@@ -1,0 +1,99 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum Role {
+  USER
+  ADMIN
+}
+
+model User {
+  id        String    @id // Este ID virá do Supabase Auth
+  email     String    @unique
+  name      String?
+  avatarUrl String?
+  role      Role     @default(USER)
+
+  posts Post[]
+  comments  Comment[] // Comentários que o User fez
+
+  commentLikes CommentLikes[]
+}
+
+enum Language {
+  pt
+  en
+  es
+}
+
+model Post {
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  slug      String   @unique // URL única (ex: 'meu-primeiro-post')
+  published Boolean  @default(false)
+  
+  authorId String
+  author User @relation(fields: [authorId], references: [id])
+  translations PostTranslation[]
+  
+  attachments PostAttachment[]
+  comments Comment[]
+}
+
+model PostTranslation {
+  id      String   @id @default(uuid())
+
+  title   String
+  body    String   @db.Text
+  
+  lang    Language // 'pt' ou 'en'
+  
+  // A conexão com o Post pai (Foreign Key)
+  postId  String
+  post    Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
+
+  // Garante que não existam duas traduções em 'pt' para o mesmo post
+  @@unique([postId, lang])
+}
+
+model PostAttachment {
+  id        String   @id @default(uuid())
+  name      String
+  url       String
+  type      String
+  
+  postId    String
+  post      Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
+}
+
+model Comment {
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+  text      String
+
+  postId    String
+  post      Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
+ 
+  authorId  String
+  author    User     @relation(fields: [authorId], references: [id])
+
+  commentLikes CommentLikes[]
+}
+
+model CommentLikes {
+  id String @id @default(uuid())
+  commentId String
+  comment Comment @relation(fields: [commentId], references: [id], onDelete: Cascade)
+
+  userId String?
+  user User? @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@unique([commentId, userId])
+}
