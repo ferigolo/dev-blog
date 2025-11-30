@@ -1,6 +1,6 @@
 import { notFound } from 'next/navigation'
 import { Button } from '@/components/ui/button'
-import { ArrowLeft, Globe, Download, FileText, Calendar, User as UserIcon, Trash2, Paperclip } from 'lucide-react';
+import { ArrowLeft, Globe, Download, FileText, Calendar, User as UserIcon, Paperclip } from 'lucide-react';
 import Link from 'next/link'
 import prisma from '@/lib/prisma'
 import { Language } from '@/generated/prisma/enums'
@@ -9,6 +9,8 @@ import { checkCommentAuthority } from '@/app/actions/permissions/check-comment-a
 import { CommentItem } from '@/components/comment-item';
 import getAuthenticatedUser from '@/utils/get-authenticated-user';
 import Image from 'next/image';
+import { incrementPostView } from '@/app/actions/posts';
+import { ViewCounter } from '@/components/view-counter';
 
 export default async function PostPage({ params, searchParams }: {
   params: Promise<{ slug: string }>,
@@ -43,6 +45,8 @@ export default async function PostPage({ params, searchParams }: {
   const galleryImages = post.attachments.filter(att => att.type.startsWith('image/'))
   const documents = post.attachments.filter(att => !att.type.startsWith('image/'))
 
+  incrementPostView(post.id)
+
   return (
     <article className="container max-w-4xl mx-auto py-10 px-4">
       <div className="flex justify-between items-center mb-8 sticky top-0 bg-background/95 backdrop-blur py-4 border-b">
@@ -75,6 +79,8 @@ export default async function PostPage({ params, searchParams }: {
             <Calendar className="w-4 h-4" />
             <time>{new Date(post.createdAt).toLocaleDateString()}</time>
           </div>
+          <span className="text-border">|</span>
+          <ViewCounter views={post.views}></ViewCounter>
         </div>
       </header>
 

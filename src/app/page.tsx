@@ -8,6 +8,7 @@ import { Language, Role } from '@/generated/prisma/enums'
 import prisma from '@/lib/prisma'
 import Image from 'next/image'
 import getAuthenticatedUser from '@/utils/get-authenticated-user';
+import { ViewCounter } from '@/components/view-counter';
 
 export default async function Home({
   searchParams
@@ -71,6 +72,8 @@ export default async function Home({
                   <span>{post.author.name || 'Admin'}</span>
                   <span>•</span>
                   <time>{new Date(post.createdAt).toLocaleDateString()}</time>
+                  <span>•</span>
+                  <ViewCounter views={post.views}></ViewCounter>
                 </div>
               </CardHeader>
 

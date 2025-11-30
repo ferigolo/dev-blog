@@ -8,6 +8,17 @@ import checkIsAdmin from "@/utils/check-is-admin";
 import getAuthenticatedUser from "@/utils/get-authenticated-user";
 import Attachment from "@/components/post-form";
 
+export async function incrementPostView(id: string) {
+  try {
+    await prisma.post.update({
+      where: { id },
+      data: { views: { increment: 1 } },
+    });
+  } catch (error) {
+    console.error("Erro ao incrementar contador de views: ", error);
+  }
+}
+
 export async function createPost(formData: FormData) {
   const user = await getAuthenticatedUser();
   const isAdmin = await checkIsAdmin(user);
@@ -15,7 +26,9 @@ export async function createPost(formData: FormData) {
   if (!user || !isAdmin) throw new Error("Usuário precisar ser admin");
 
   const attachments = formData.get("attachments") as string;
-  const attachmentsObj = attachments ? (JSON.parse(attachments) as Attachment[]) : [];
+  const attachmentsObj = attachments
+    ? (JSON.parse(attachments) as Attachment[])
+    : [];
 
   const titlePt = formData.get("title") as string;
   const bodyPt = formData.get("body") as string;
