@@ -14,8 +14,8 @@ export async function createPost(formData: FormData) {
 
   if (!user || !isAdmin) throw new Error("Usuário precisar ser admin");
 
-  let attachments = formData.get("attachments") as string;
-  attachments = attachments ? (JSON.parse(attachments) as Attachment[]) : [];
+  const attachments = formData.get("attachments") as string;
+  const attachmentsObj = attachments ? (JSON.parse(attachments) as Attachment[]) : [];
 
   const titlePt = formData.get("title") as string;
   const bodyPt = formData.get("body") as string;
@@ -46,7 +46,7 @@ export async function createPost(formData: FormData) {
         ],
       },
       attachments: {
-        create: attachments.map((att: Attachment) => ({
+        create: attachmentsObj.map((att: Attachment) => ({
           name: att.name,
           url: att.url,
           type: att.type,

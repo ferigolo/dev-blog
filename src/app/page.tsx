@@ -1,9 +1,13 @@
+"use server";
+
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
 import { Globe, User } from 'lucide-react'
-import { Language } from '@/generated/prisma/enums'
+import { Language, Role } from '@/generated/prisma/enums'
 import prisma from '@/lib/prisma'
+import Image from 'next/image'
+import getAuthenticatedUser from '@/utils/get-authenticated-user';
 
 export default async function Home({
   searchParams
@@ -11,9 +15,8 @@ export default async function Home({
   searchParams: Promise<{ lang?: string }>
 }) {
   const { lang } = await searchParams
-
   const currentLang = (lang === 'en' ? 'en' : 'pt') as Language
-
+  const user = await getAuthenticatedUser()
   const posts = await prisma.post.findMany({
     where: { published: true },
     orderBy: { createdAt: 'desc' },
@@ -21,13 +24,13 @@ export default async function Home({
       translations: {
         where: { lang: currentLang }
       },
-      author: true
+      author: true,
+      attachments: { select: { url: true } }
     }
   })
 
   return (
     <main className="container mx-auto py-10 px-4">
-      {/* Cabeçalho com Título e Troca de Idioma */}
       <div className="flex justify-between items-center mb-12 border-b pb-6">
         <div>
           <h1 className="text-4xl font-bold tracking-tight">Meu Blog Tech</h1>
@@ -37,12 +40,10 @@ export default async function Home({
         </div>
 
         <div className="flex gap-4 items-center">
-          {/* Botão de Admin (se quiser facilitar seu acesso) */}
-          <Link href="/admin">
+          {user && user?.role == Role.ADMIN && <Link href="/admin">
             <Button variant="ghost" size="sm">Área Admin</Button>
-          </Link>
+          </Link>}
 
-          {/* Botão de Troca de Idioma */}
           <Link href={`?lang=${currentLang === 'pt' ? 'en' : 'pt'}`}>
             <Button variant="outline" size="sm" className="gap-2">
               <Globe className="w-4 h-4" />
@@ -52,25 +53,16 @@ export default async function Home({
         </div>
       </div>
 
-      {/* Grid de Posts */}
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
         {posts.map((post) => {
-          // Se não tiver tradução (erro de dados), usa fallback
           const content = post.translations[0] || { title: 'Sem tradução', body: '' }
-
           return (
             <Card key={post.id} className="flex flex-col h-full hover:shadow-lg transition-shadow">
               <CardHeader>
-                {/* {post.attachment && (
+                {post.attachments &&
                   <div className="relative w-full h-48 mb-4 rounded-md overflow-hidden">
-                    <Image
-                      src={post.imageUrl}
-                      alt={content.title}
-                      fill
-                      className="object-cover"
-                    />
-                  </div>
-                )} */}
+                    <Image key={post.attachments[0].url} src={post.attachments[0].url} fill className="object-cover" alt={""} /></div>
+                }
                 <CardTitle className="line-clamp-2 leading-tight">
                   {content.title}
                 </CardTitle>

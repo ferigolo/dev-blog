@@ -6,9 +6,8 @@ import { ArrowLeft } from 'lucide-react'
 import prisma from '@/lib/prisma'
 
 export default async function EditPostPage({ params }: { params: Promise<{ id: string }> }) {
-  const { id } = await params // Next.js 15
+  const { id } = await params
 
-  // Busca o post e a tradução PT para preencher o form
   const post = await prisma.post.findUnique({
     where: { id },
     include: {
@@ -18,7 +17,6 @@ export default async function EditPostPage({ params }: { params: Promise<{ id: s
 
   if (!post) notFound()
 
-  // Formata os dados para o formulário
   const initialData = {
     id: post.id,
     title: post.translations[0]?.title || '',

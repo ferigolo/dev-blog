@@ -10,20 +10,19 @@ import { useState } from 'react';
 import { Paperclip, X } from 'lucide-react';
 import { createClient } from '@/utils/supabase/client';
 
-const BUCKET_NAME = 'my-blog-bucket'
+const BUCKET_NAME = 'blog-posts-attachments'
 
 interface PostData {
   id?: string
   title: string
   body: string
   imageUrl?: string | null
-  attachments: Attachment[] | null
+  attachments?: Attachment[] | null
 }
 
 export default interface Attachment {
   name: string
   type: string
-  isUploading: boolean
   size: number
   url: string
   data: {
@@ -32,7 +31,6 @@ export default interface Attachment {
     fullPath: string;
   } | null
 }
-
 
 export function PostForm({ initialData }: { initialData?: PostData }) {
   const isEditing = !!initialData?.id
@@ -63,7 +61,6 @@ export function PostForm({ initialData }: { initialData?: PostData }) {
         newAttachments.push({
           name: file.name,
           type: file.type,
-          isUploading: true,
           size: file.size,
           data, url: urlData.publicUrl
         })
