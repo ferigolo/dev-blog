@@ -11,6 +11,6 @@ export async function translateText(text: string, targetLang: string) {
     return res.text;
   } catch (error) {
     console.error('Erro na tradução:', error);
-    return text; // Fallback: retorna o original se der erro
+    return text;
   }
 }

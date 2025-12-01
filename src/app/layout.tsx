@@ -16,8 +16,24 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Meu Blog",
-  description: "Criado com Next.js 15 e Supabase",
+  // Define a URL base para resolver imagens relativas (obrigatório para OG Images)
+  metadataBase: new URL(process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'),
+
+  title: {
+    default: "Dev Blog - Enzo Ferigolo",
+    template: "%s | Dev Blog",
+  },
+  description: "Um blog sobre desenvolvimento, Python, Next.js, Carreira e Ciência da Computação.",
+
+  // Open Graph (Facebook, LinkedIn, Discord)
+  openGraph: {
+    title: "Dev Enzo Ferigolo",
+    description: "Aprendizados sobre tecnologia e carreira.",
+    url: "/",
+    siteName: "Dev Enzo Ferigolo",
+    locale: "pt_BR",
+    type: "website",
+  },
 };
 
 export default async function RootLayout({
