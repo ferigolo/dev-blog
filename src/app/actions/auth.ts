@@ -22,7 +22,6 @@ export async function signInWithGoogle() {
     console.error(error);
     redirect("/login?error=Google Login Failed");
   }
-
   redirect(data.url);
 }
 

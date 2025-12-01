@@ -5,8 +5,6 @@ import Navbar from "@/components/navbar";
 import { UserProvider } from "@/context/user-context";
 import getAuthenticatedUser from "@/utils/get-authenticated-user";
 
-export const dynamic = 'force-dynamic'
-
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
